@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOKKAI KADAI HARIAN N3</title>
+<style>
+:root{
+  --navy:#1c2b40;
+  --navy-deep:#121e30;
+  --cream:#faf5ea;
+  --cream-deep:#f2e9d8;
+  --card:#fffdf9;
+  --border:#e7dcc4;
+  --text:#2b2b2b;
+  --sub:#6b6456;
+  --gold:#c9a866;
+  --gold-deep:#b3934f;
+  --good:#3f7a5c;
+  --good-bg:#eaf5ee;
+  --bad:#bc4a3c;
+  --bad-bg:#fbeae7;
+  --shadow:0 2px 8px rgba(28,43,64,.06), 0 8px 24px rgba(28,43,64,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:"Hiragino Sans","Noto Sans JP","Zen Kaku Gothic New",sans-serif;
+  background:var(--cream);
+  color:var(--text);
+  min-height:100vh;
+}
+.wrap{max-width:900px;margin:0 auto;padding:18px 16px 70px}
+
+/* ===== Header ===== */
+.app-header{
+  background:linear-gradient(135deg,var(--navy) 0%, var(--navy-deep) 100%);
+  border-radius:18px;
+  padding:22px 24px;
+  color:#f5efe0;
+  box-shadow:var(--shadow);
+  margin-bottom:18px;
+}
+.app-header h1{
+  margin:0 0 4px; font-size:1.35rem; font-weight:700; letter-spacing:.02em;
+}
+.app-header p{margin:0; font-size:.85rem; color:#c9d2de}
+
+/* ===== Section titles ===== */
+.section-title{font-size:1.15rem; font-weight:700; text-align:center; margin:6px 0 4px; color:var(--navy)}
+.section-sub{font-size:.82rem; color:var(--sub); text-align:center; margin:0 0 18px; line-height:1.6}
+
+/* ===== Cards (menu screen) ===== */
+.menu-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px 18px;
+  box-shadow:var(--shadow);
+  margin-bottom:12px;
+  display:flex; align-items:center; gap:14px;
+  cursor:pointer;
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.menu-card:hover{transform:translateY(-1px); box-shadow:0 4px 14px rgba(28,43,64,.12)}
+.menu-card.disabled{opacity:.5; cursor:not-allowed}
+.menu-card .icon{font-size:1.6rem; flex:0 0 auto; width:40px; text-align:center}
+.menu-card .body{flex:1; min-width:0}
+.menu-card .title{font-weight:700; font-size:1rem; margin-bottom:2px; color:var(--navy)}
+.menu-card .desc{font-size:.78rem; color:var(--sub); margin-bottom:8px}
+.menu-card .progress-track{height:6px; background:var(--cream-deep); border-radius:99px; overflow:hidden}
+.menu-card .progress-fill{height:100%; background:linear-gradient(90deg,var(--gold),var(--gold-deep)); border-radius:99px; transition:width .3s ease}
+.menu-card .count{font-size:.72rem; color:var(--sub); margin-top:4px}
+.menu-card .arrow{font-size:1.2rem; color:var(--gold-deep); flex:0 0 auto}
+
+.subhead{
+  font-size:.85rem; font-weight:700; color:var(--navy);
+  margin:22px 2px 10px; display:flex; align-items:center; gap:6px;
+}
+
+.grid-btns{display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-bottom:8px}
+.grid-btns button{
+  background:var(--card); border:1px solid var(--border); border-radius:10px;
+  padding:12px 4px; font-size:.85rem; font-weight:600; color:var(--navy);
+  cursor:pointer; transition:all .12s ease;
+}
+.grid-btns button:hover:not(:disabled){border-color:var(--gold-deep); background:var(--cream-deep)}
+.grid-btns button:disabled{opacity:.35; cursor:not-allowed}
+.grid-btns button.cleared{background:var(--good-bg); border-color:var(--good); color:var(--good)}
+.hint-text{font-size:.72rem; color:var(--sub); text-align:center; margin:6px 0 4px}
+
+.pill-btns{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px}
+.pill-btns button{
+  background:var(--card); border:1px solid var(--border); border-radius:999px;
+  padding:9px 16px; font-size:.82rem; font-weight:600; color:var(--navy);
+  cursor:pointer; transition:all .12s ease;
+}
+.pill-btns button:hover:not(:disabled){border-color:var(--gold-deep); background:var(--cream-deep)}
+.pill-btns button:disabled{opacity:.4; cursor:not-allowed}
+.pill-btns button .cnt{font-weight:400; color:var(--sub); font-size:.74rem}
+
+.back-link{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:.8rem; color:var(--navy); font-weight:600; cursor:pointer;
+  margin-bottom:12px; background:none; border:none; padding:6px 0;
+}
+
+/* ===== Quiz card ===== */
+.progress-wrap{position:sticky; top:0; z-index:10; background:linear-gradient(var(--cream) 82%, transparent); padding:8px 0 12px}
+.progress-info{display:flex; justify-content:space-between; font-size:.75rem; color:var(--sub); margin-bottom:6px; padding:0 2px}
+.progress-info b{color:var(--navy)}
+.progress-track-top{height:6px; background:var(--cream-deep); border-radius:99px; overflow:hidden; border:1px solid var(--border)}
+.progress-fill-top{height:100%; background:linear-gradient(90deg,var(--gold),var(--gold-deep)); border-radius:99px; transition:width .3s ease}
+
+.qcard{
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  padding:22px 20px; box-shadow:var(--shadow); margin-top:8px;
+}
+.qcard .catbadge{
+  display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.03em;
+  background:var(--navy); color:#f5efe0; padding:4px 12px; border-radius:99px; margin-bottom:12px;
+}
+.qnum-badge{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:32px; height:32px; border-radius:9px; background:var(--navy); color:#f5efe0;
+  font-weight:700; font-size:.85rem; margin-right:10px; flex:0 0 auto;
+}
+.qstem-row{display:flex; align-items:flex-start; margin-bottom:14px}
+.qstem{font-size:1rem; line-height:1.9}
+.qstem u{text-decoration-color:var(--bad); text-decoration-thickness:2px; text-underline-offset:3px}
+
+.passage-box{
+  background:var(--cream-deep); border:1px solid var(--border); border-radius:12px;
+  padding:14px 16px; margin:0 0 16px; max-height:320px; overflow-y:auto;
+}
+.passage-box .ptitle{font-size:.8rem; font-weight:700; color:var(--gold-deep); margin-bottom:8px}
+.passage-box .ptext{font-size:.94rem; line-height:2; color:var(--text)}
+.passage-box .ptext u{text-decoration-color:var(--bad); text-decoration-thickness:2px; text-underline-offset:3px}
+.passage-box::-webkit-scrollbar{width:6px}
+.passage-box::-webkit-scrollbar-thumb{background:var(--border); border-radius:3px}
+
+.opts{display:flex; flex-direction:column; gap:9px}
+.opt{
+  display:flex; align-items:flex-start; gap:12px; border:1.5px solid var(--border);
+  border-radius:12px; padding:12px 14px; cursor:pointer; background:#fffefb;
+  font-size:.94rem; line-height:1.6; transition:all .12s ease;
+}
+.opt:hover:not(.disabled){border-color:var(--gold-deep); background:var(--cream-deep)}
+.opt .badge{
+  flex:0 0 auto; width:26px; height:26px; border-radius:50%; border:1.5px solid var(--sub);
+  display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:700; color:var(--sub);
+}
+.opt.selected{border-color:var(--navy); background:#eef1f5}
+.opt.selected .badge{background:var(--navy); border-color:var(--navy); color:#fff}
+.opt.correct{border-color:var(--good); background:var(--good-bg)}
+.opt.correct .badge{background:var(--good); border-color:var(--good); color:#fff}
+.opt.incorrect{border-color:var(--bad); background:var(--bad-bg)}
+.opt.incorrect .badge{background:var(--bad); border-color:var(--bad); color:#fff}
+.opt.disabled{cursor:default}
+
+.feedback{margin-top:16px; border-radius:12px; overflow:hidden; display:none}
+.feedback.show{display:block}
+.fb-head{padding:10px 16px; font-weight:700; font-size:.85rem}
+.feedback.ok .fb-head{background:var(--good); color:#fff}
+.feedback.ng .fb-head{background:var(--bad); color:#fff}
+.fb-body{background:var(--card); border:1px solid var(--border); border-top:none; padding:14px 16px; font-size:.87rem; line-height:1.85}
+.fb-correct-ans{background:var(--cream-deep); border-left:3px solid var(--good); padding:8px 12px; border-radius:0 8px 8px 0; margin-bottom:10px}
+.orig-block{margin-top:14px; border-top:1px dashed var(--border); padding-top:12px}
+.orig-block .lbl{font-size:.7rem; font-weight:700; letter-spacing:.04em; color:var(--gold-deep); text-transform:uppercase; margin:10px 0 4px}
+.orig-block .jp{font-size:1rem; line-height:2.2}
+.orig-block .id2{font-size:.83rem; color:var(--sub); line-height:1.75; white-space:pre-line}
+.orig-block ol{margin:4px 0 0; padding-left:20px}
+.orig-block ol li{font-size:.88rem; line-height:2; margin-bottom:4px}
+.orig-block ol li.correct-li{color:var(--good); font-weight:700}
+ruby rt{font-size:.6em; color:var(--sub)}
+
+.navbar{display:flex; justify-content:space-between; gap:10px; margin-top:18px}
+.nbtn{flex:1; padding:13px; border-radius:12px; font-weight:700; font-size:.88rem; border:none; cursor:pointer; transition:all .12s ease}
+.nbtn.prev{background:var(--cream-deep); color:var(--navy)}
+.nbtn.prev:disabled{opacity:.35; cursor:not-allowed}
+.nbtn.next{background:var(--navy); color:#f5efe0}
+.nbtn.next:hover{background:var(--navy-deep)}
+
+/* ===== Result ===== */
+.result-card{background:var(--card); border:1px solid var(--border); border-radius:18px; padding:34px 26px; text-align:center; box-shadow:var(--shadow)}
+.result-ring{width:140px; height:140px; margin:0 auto 16px; position:relative}
+.result-ring svg{transform:rotate(-90deg)}
+.result-ring .pct{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center}
+.result-ring .pct b{font-size:1.8rem}
+.result-ring .pct span{font-size:.7rem; color:var(--sub); margin-top:2px}
+.result-card h2{margin:0 0 4px; font-size:1.3rem; color:var(--navy)}
+.result-card .comment{font-size:.85rem; color:var(--sub); margin-bottom:20px}
+.result-actions{display:flex; flex-direction:column; gap:10px; margin-top:16px}
+.result-btn{padding:13px; border-radius:12px; font-weight:700; font-size:.9rem; border:none; cursor:pointer}
+.result-btn.primary{background:var(--navy); color:#f5efe0}
+.result-btn.secondary{background:var(--cream-deep); color:var(--navy); border:1px solid var(--border)}
+
+.hidden{display:none !important}
+
+@media(max-width:520px){
+  .grid-btns{grid-template-columns:repeat(4,1fr)}
+  .qcard{padding:18px 14px}
+  .menu-card{padding:14px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="app-header">
+    <h1>📖 DOKKAI KADAI HARIAN N3</h1>
+    <p>読解 課題＋集中トレーニング</p>
+  </div>
+
+  <!-- ===== MENU SCREEN ===== -->
+  <div id="menuScreen">
+    <div class="section-title">挑戦するセットを選んでください</div>
+    <div class="section-sub">好きなセットをタップすればすぐに始まります。進捗は自動的に保存され、間違えた問題はあとでまとめて復習できます。</div>
+
+    <div class="menu-card" onclick="startQuiz(getAllQuestions())">
+      <div class="icon">📘</div>
+      <div class="body">
+        <div class="title">全課題に挑戦</div>
+        <div class="desc" id="allDesc">課題1〜5 まとめて（16問）</div>
+        <div class="progress-track"><div class="progress-fill" id="allProgressFill" style="width:0%"></div></div>
+        <div class="count" id="allProgressText">0 / 16 問回答済み</div>
+      </div>
+      <div class="arrow">›</div>
+    </div>
+
+    <div class="menu-card" onclick="startQuiz(getAllQuestions(),'集中トレーニング（全カテゴリー）')">
+      <div class="icon">🎯</div>
+      <div class="body">
+        <div class="title">集中トレーニングに挑戦</div>
+        <div class="desc">全カテゴリーまとめて</div>
+        <div class="progress-track"><div class="progress-fill" id="focusProgressFill" style="width:0%"></div></div>
+        <div class="count" id="focusProgressText">0 / 16 問回答済み</div>
+      </div>
+      <div class="arrow">›</div>
+    </div>
+
+    <div class="menu-card" id="reviewCard" onclick="startReview()">
+      <div class="icon">❌</div>
+      <div class="body">
+        <div class="title">間違えた問題を復習</div>
+        <div class="desc" id="reviewDesc">これまでに間違えた問題だけをまとめて解く（0問）</div>
+      </div>
+      <div class="arrow">›</div>
+    </div>
+
+    <div class="subhead">📗 特定の課題を選ぶ</div>
+    <div class="grid-btns" id="kadaiGrid"></div>
+    <div class="hint-text" id="kadaiHint"></div>
+
+    <div class="subhead">🎯 特定のカテゴリー（集中トレーニング）を選ぶ</div>
+    <div class="pill-btns" id="categoryPills"></div>
+  </div>
+
+  <!-- ===== QUIZ SCREEN ===== -->
+  <div id="quizScreen" class="hidden">
+    <button class="back-link" onclick="goToMenu()">← セット選択に戻る</button>
+    <div class="progress-wrap">
+      <div class="progress-info"><span id="quizModeLabel">課題1</span><span id="progressText">1 / 3</span></div>
+      <div class="progress-track-top"><div class="progress-fill-top" id="progressFillTop" style="width:0%"></div></div>
+    </div>
+    <div class="qcard" id="qcard"></div>
+    <div class="navbar">
+      <button class="nbtn prev" id="prevBtn" onclick="goPrev()">← 前へ</button>
+      <button class="nbtn next" id="nextBtn" onclick="goNext()">次へ →</button>
+    </div>
+  </div>
+
+  <!-- ===== RESULT SCREEN ===== -->
+  <div id="resultScreen" class="hidden">
+    <div class="result-card">
+      <div class="result-ring">
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="60" fill="none" stroke="#f2e9d8" stroke-width="11"/>
+          <circle id="ringFg" cx="70" cy="70" r="60" fill="none" stroke="#c9a866" stroke-width="11" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377"/>
+        </svg>
+        <div class="pct"><b id="scorePct">0%</b><span id="scoreFrac">0 / 0</span></div>
+      </div>
+      <h2 id="resultTitle">お疲れ様でした</h2>
+      <p class="comment" id="resultComment"></p>
+      <div class="result-actions">
+        <button class="result-btn primary" onclick="showReviewList()">📋 この回の解説をまとめて見る</button>
+        <button class="result-btn secondary" onclick="goToMenu()">🏠 セット選択に戻る</button>
+      </div>
+      <div id="reviewListArea" style="text-align:left; margin-top:22px;"></div>
+    </div>
+  </div>
+
+</div>
+<script>
+/* =========================================================
+   DATA: KADAI (課題 harian) — tiap kadai berisi 1 kategori dokkai
+   category: "tanbun" (短文読解) | "chubun" (中文読解) | "chobun" (長文読解) | "jouhou" (情報検索)
+========================================================= */
+const KADAI = 
+[
+  {
+    "id": 1,
+    "category": "chubun",
+    "day": "課題1",
+    "passageTitle": "A町の朝市（あさいち）",
+    "passage": "A町は<ruby>景色<rt>けしき</rt></ruby>の美しい<ruby>海沿<rt>うみぞ</rt></ruby>いの町で、毎週日曜の朝に港で開かれる「<ruby>朝市<rt>あさいち</rt></ruby>」も人気がある。<ruby>朝市<rt>あさいち</rt></ruby>は、A町にある店が、魚や肉、野菜、パン、ケーキなどを売る<ruby>市場<rt>いちば</rt></ruby>で、近くの市や町からも客が<ruby>大勢<rt>おおぜい</rt></ruby>やってくる。<br><br><ruby>朝市<rt>あさいち</rt></ruby>を始めたのは、A町に昔からある店の主人たちである。約30年前、大きなスーパーマーケットができた。多くの人がスーパーを利用するようになってしまったため、店の主人たちは、自分たちの店の<ruby>商品<rt>しょうひん</rt></ruby>の良さをもっと知ってもらおうと、<ruby>朝市<rt>あさいち</rt></ruby>を始めたのだ。<br><br><ruby>朝市<rt>あさいち</rt></ruby>では、人気がある<ruby>商品<rt>しょうひん</rt></ruby>はすぐ<ruby>売<rt>う</rt></ruby>り<ruby>切<rt>き</rt></ruby>れてしまう。そんなに人気があるなら、たくさん<ruby>売<rt>う</rt></ruby>ればいいのだが、<u>それ</u>はしないそうだ。この<ruby>朝市<rt>あさいち</rt></ruby>の<ruby>目的<rt>もくてき</rt></ruby>は、<ruby>朝市<rt>あさいち</rt></ruby>でお金を<ruby>稼<rt>かせ</rt></ruby>ぐことではなく、まず<ruby>朝市<rt>あさいち</rt></ruby>で自分たちの店について知ってもらって、ふだんA町の店で買い物をする客を増やすことだからだ。そのため、<ruby>朝市<rt>あさいち</rt></ruby>に<ruby>商品<rt>しょうひん</rt></ruby>が出せる人は（　　）だけ、ということになっている。",
+    "questions": [
+      {
+        "stem": "A町にある店の主人たちは、何のために朝市を始めたのか。",
+        "opts": [
+          "町の中に、安く買い物ができるところを増やすため",
+          "町の中に、近くの市や町から来る客が楽しめる場所を作るため",
+          "自分たちの町の景色の美しさをもっと宣伝するため",
+          "自分たちの店の商品の良さをもっと知ってもらうため"
+        ],
+        "ans": 3,
+        "exp": "Paragraf ke-2 menjelaskan: setelah supermarket besar dibangun dan banyak orang beralih belanja ke sana, para pemilik toko memulai pasar pagi agar orang lebih tahu kualitas barang toko mereka sendiri. Jawaban 4 sesuai persis.",
+        "full": "<ruby>店<rt>みせ</rt></ruby>の<ruby>主人<rt>しゅじん</rt></ruby>たちは、何のために<ruby>朝市<rt>あさいち</rt></ruby>を始めたのか。",
+        "ftr": "Kota A adalah kota tepi laut yang pemandangannya indah, dan \"pasar pagi\" yang diadakan di pelabuhan setiap Minggu pagi juga populer. Pasar pagi adalah pasar tempat toko-toko di Kota A menjual ikan, daging, sayuran, roti, kue, dll., dan banyak pengunjung datang bahkan dari kota/daerah sekitar.\n\nYang memulai pasar pagi adalah para pemilik toko lama di Kota A. Sekitar 30 tahun lalu, sebuah supermarket besar dibangun. Karena banyak orang jadi berbelanja di supermarket, para pemilik toko memulai pasar pagi agar orang-orang lebih mengenal kualitas barang dagangan toko mereka sendiri.\n\nDi pasar pagi, barang yang populer cepat habis terjual. Padahal kalau memang sepopuler itu, bukankah lebih baik dijual lebih banyak — tapi ternyata mereka sengaja TIDAK melakukan itu. Tujuan pasar pagi ini bukan untuk mencari uang di pasar pagi itu sendiri, melainkan agar orang mengenal toko mereka lewat pasar pagi, lalu jumlah pelanggan yang berbelanja di toko Kota A sehari-hari (di luar pasar pagi) bertambah. Karena itu, yang boleh menjual barang di pasar pagi hanyalah orang yang [___].",
+        "oi": [
+          "1. Untuk menambah tempat belanja murah di dalam kota. (salah, tidak disebutkan soal harga murah)",
+          "2. Untuk membuat tempat yang bisa dinikmati pengunjung dari kota/daerah sekitar. (salah, ini efek sampingan bukan tujuan utama)",
+          "3. Untuk lebih mempromosikan keindahan pemandangan kota mereka. (salah, bukan soal promosi pemandangan)",
+          "4. <ruby>自分<rt>じぶん</rt></ruby>たちの<ruby>店<rt>みせ</rt></ruby>の<ruby>商品<rt>しょうひん</rt></ruby>の<ruby>良<rt>よ</rt></ruby>さをもっと<ruby>知<rt>し</rt></ruby>ってもらうため ＝ Agar orang lebih mengenal kualitas barang dagangan toko mereka sendiri. ✓ (jawaban benar)"
+        ]
+      },
+      {
+        "stem": "<u>それ</u>とあるが、何か。",
+        "opts": [
+          "朝市で人気がある商品を、店で売るより高く売ること",
+          "朝市で人気がある商品を、朝市でもっと売ること",
+          "朝市でしか買えない商品の種類を増やすこと",
+          "朝市でしか買えない商品を平日に店でも売ること"
+        ],
+        "ans": 1,
+        "exp": "「それ」merujuk pada tindakan \"menjual lebih banyak\" (たくさん売ればいい) barang populer di pasar pagi yang disebut sebelumnya. Kalimat menyatakan mereka SENGAJA TIDAK melakukan itu, karena tujuan pasar pagi bukan mencari untung sebanyak-banyaknya di sana.",
+        "full": "<u>それ</u>とあるが、何か。",
+        "ftr": "Kota A adalah kota tepi laut yang pemandangannya indah, dan \"pasar pagi\" yang diadakan di pelabuhan setiap Minggu pagi juga populer. Pasar pagi adalah pasar tempat toko-toko di Kota A menjual ikan, daging, sayuran, roti, kue, dll., dan banyak pengunjung datang bahkan dari kota/daerah sekitar.\n\nYang memulai pasar pagi adalah para pemilik toko lama di Kota A. Sekitar 30 tahun lalu, sebuah supermarket besar dibangun. Karena banyak orang jadi berbelanja di supermarket, para pemilik toko memulai pasar pagi agar orang-orang lebih mengenal kualitas barang dagangan toko mereka sendiri.\n\nDi pasar pagi, barang yang populer cepat habis terjual. Padahal kalau memang sepopuler itu, bukankah lebih baik dijual lebih banyak — tapi ternyata mereka sengaja TIDAK melakukan itu. Tujuan pasar pagi ini bukan untuk mencari uang di pasar pagi itu sendiri, melainkan agar orang mengenal toko mereka lewat pasar pagi, lalu jumlah pelanggan yang berbelanja di toko Kota A sehari-hari (di luar pasar pagi) bertambah. Karena itu, yang boleh menjual barang di pasar pagi hanyalah orang yang [___].",
+        "oi": [
+          "1. Menjual barang populer pasar pagi dengan harga lebih mahal dari harga toko. (salah, tidak disebutkan soal menaikkan harga)",
+          "2. <ruby>朝市<rt>あさいち</rt></ruby>で<ruby>人気<rt>にんき</rt></ruby>がある<ruby>商品<rt>しょうひん</rt></ruby>を、<ruby>朝市<rt>あさいち</rt></ruby>でもっと<ruby>売<rt>う</rt></ruby>ること ＝ Menjual lebih banyak barang populer itu di pasar pagi. ✓ (jawaban benar — ini yang dimaksud \"それ\" dan yang TIDAK mereka lakukan)",
+          "3. Menambah jenis barang yang hanya bisa dibeli di pasar pagi. (salah, tidak disebutkan)",
+          "4. Menjual di toko biasa (hari kerja) barang yang hanya ada di pasar pagi. (salah, bertentangan dengan konsep pasar pagi sebagai daya tarik khusus)"
+        ]
+      },
+      {
+        "stem": "（　　）に入れるのに最もよいものはどれか。",
+        "opts": [
+          "A町に店がある人",
+          "A町以外の市や町に店がある人",
+          "A町で店を開きたいと思っている人",
+          "A町の店でふだんから買い物をしている人"
+        ],
+        "ans": 0,
+        "exp": "Tujuan pasar pagi adalah agar orang mengenal TOKO-TOKO di Kota A, sehingga pelanggan sehari-hari toko tersebut bertambah. Maka yang boleh berjualan di pasar pagi harus orang yang memang punya toko DI Kota A itu sendiri.",
+        "full": "（　　）に入れるのに最もよいものはどれか。",
+        "ftr": "Kota A adalah kota tepi laut yang pemandangannya indah, dan \"pasar pagi\" yang diadakan di pelabuhan setiap Minggu pagi juga populer. Pasar pagi adalah pasar tempat toko-toko di Kota A menjual ikan, daging, sayuran, roti, kue, dll., dan banyak pengunjung datang bahkan dari kota/daerah sekitar.\n\nYang memulai pasar pagi adalah para pemilik toko lama di Kota A. Sekitar 30 tahun lalu, sebuah supermarket besar dibangun. Karena banyak orang jadi berbelanja di supermarket, para pemilik toko memulai pasar pagi agar orang-orang lebih mengenal kualitas barang dagangan toko mereka sendiri.\n\nDi pasar pagi, barang yang populer cepat habis terjual. Padahal kalau memang sepopuler itu, bukankah lebih baik dijual lebih banyak — tapi ternyata mereka sengaja TIDAK melakukan itu. Tujuan pasar pagi ini bukan untuk mencari uang di pasar pagi itu sendiri, melainkan agar orang mengenal toko mereka lewat pasar pagi, lalu jumlah pelanggan yang berbelanja di toko Kota A sehari-hari (di luar pasar pagi) bertambah. Karena itu, yang boleh menjual barang di pasar pagi hanyalah orang yang [___].",
+        "oi": [
+          "1. A<ruby>町<rt>ちょう</rt></ruby>に<ruby>店<rt>みせ</rt></ruby>がある<ruby>人<rt>ひと</rt></ruby> ＝ Orang yang punya toko di Kota A. ✓ (jawaban benar)",
+          "2. Orang yang punya toko di kota/daerah LAIN selain Kota A. (salah, bertentangan dengan tujuan mempromosikan toko-toko Kota A sendiri)",
+          "3. Orang yang ingin membuka toko di Kota A. (salah, harus SUDAH punya toko, bukan sekadar berencana)",
+          "4. Orang yang biasa berbelanja di toko-toko Kota A. (salah, ini soal PEMBELI bukan PENJUAL/pemilik toko yang boleh ikut pasar pagi)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "category": "chubun",
+    "day": "課題2",
+    "passageTitle": "漫画を読む授業",
+    "passage": "私の<ruby>留学<rt>りゅうがく</rt></ruby>している日本の大学には、<ruby>漫画<rt>まんが</rt></ruby>を読んで<ruby>社会<rt>しゃかい</rt></ruby>について考える<ruby>授業<rt>じゅぎょう</rt></ruby>があります。私は<ruby>子供<rt>こども</rt></ruby>のころから日本の<ruby>漫画<rt>まんが</rt></ruby>が大好きだったので、この<ruby>授業<rt>じゅぎょう</rt></ruby>を取りました。しかし、これは<ruby>失敗<rt>しっぱい</rt></ruby>でした。<br><br>この<ruby>授業<rt>じゅぎょう</rt></ruby>では、学生は毎週の<ruby>授業<rt>じゅぎょう</rt></ruby>の前に、先生が<ruby>指定<rt>してい</rt></ruby>した<ruby>漫画<rt>まんが</rt></ruby>を読んでいくことになっていました。ところが、<ruby>扱<rt>あつか</rt></ruby>う<ruby>漫画<rt>まんが</rt></ruby>はどれも私が知らないものばかりだったので、読むのに時間がかかって、毎回とても大変でした。<br><br>いちばん困ったのは<ruby>学期末<rt>がっきまつ</rt></ruby>の<ruby>試験<rt>しけん</rt></ruby>です。<ruby>試験<rt>しけん</rt></ruby>の前に、ある<ruby>漫画<rt>まんが</rt></ruby>を読んでおくように先生に言われました。その<ruby>漫画<rt>まんが</rt></ruby>は全部で3<ruby>巻<rt>かん</rt></ruby>もあり、しっかり読むのにはとても時間がかかりました。そのために、ほかの<ruby>試験<rt>しけん</rt></ruby>の勉強ができなくなり、寝る時間も<ruby>削<rt>けず</rt></ruby>らなければならなくなりました。いつもなら、<ruby>試験<rt>しけん</rt></ruby><ruby>期間<rt>きかん</rt></ruby>中は<ruby>漫画<rt>まんが</rt></ruby>を読むのを<ruby>我慢<rt>がまん</rt></ruby>するのですが、<u>このときの私</u>は<ruby>逆<rt>ぎゃく</rt></ruby>だったのです。<br><br><ruby>試験<rt>しけん</rt></ruby>はうまくいきましたが、今はしばらく<ruby>漫画<rt>まんが</rt></ruby>はお休みにしたい気分です。",
+    "questions": [
+      {
+        "stem": "毎回の授業の前に、学生がしなければならなかったことは何か。",
+        "opts": [
+          "授業で先生に扱ってもらいたい漫画を見つけてくること",
+          "社会問題がテーマになっている漫画を見つけてくること",
+          "先生に読んでくるように言われた漫画を読んでおくこと",
+          "自分が読んだことがない漫画を探して、読んでおくこと"
+        ],
+        "ans": 2,
+        "exp": "Teks menyatakan \"先生が指定した漫画を読んでいくことになっていました\" (harus membaca komik yang DITENTUKAN DOSEN sebelum kelas). Jawaban 3 sesuai persis.",
+        "full": "<ruby>毎回<rt>まいかい</rt></ruby>の<ruby>授業<rt>じゅぎょう</rt></ruby>の<ruby>前<rt>まえ</rt></ruby>に、<ruby>学生<rt>がくせい</rt></ruby>がしなければならなかったことは<ruby>何<rt>なに</rt></ruby>か。",
+        "ftr": "Di universitas tempat saya kuliah (sebagai mahasiswa asing) di Jepang, ada mata kuliah membaca komik sambil memikirkan tentang masyarakat. Karena saya sudah suka komik Jepang sejak kecil, saya mengambil mata kuliah ini. Tapi ternyata ini adalah kesalahan.\n\nDi kelas ini, sebelum kelas tiap minggu, mahasiswa harus membaca komik yang ditentukan dosen. Tapi komik-komik yang dibahas semuanya tidak saya kenal, jadi butuh waktu lama untuk membacanya, dan setiap minggu sangat berat.\n\nYang paling merepotkan adalah ujian akhir semester. Sebelum ujian, dosen menyuruh membaca sebuah komik terlebih dahulu. Komik itu totalnya 3 jilid, dan untuk membacanya dengan benar-benar butuh waktu sangat lama. Karena itu, saya jadi tidak bisa belajar untuk ujian lain, dan bahkan harus mengurangi waktu tidur. Biasanya, saat masa ujian saya menahan diri untuk tidak membaca komik, tapi saat itu justru sebaliknya.\n\nUjiannya berjalan lancar, tapi sekarang saya merasa ingin berhenti membaca komik untuk sementara waktu.",
+        "oi": [
+          "1. Mencari sendiri komik yang ingin dibahas dosen di kelas. (salah, dosenlah yang menentukan, bukan mahasiswa yang mencari)",
+          "2. Mencari komik yang bertema masalah sosial. (salah, tidak disebutkan syarat tema tertentu)",
+          "3. <ruby>先生<rt>せんせい</rt></ruby>に<ruby>読<rt>よ</rt></ruby>んでくるように<ruby>言<rt>い</rt></ruby>われた<ruby>漫画<rt>まんが</rt></ruby>を<ruby>読<rt>よ</rt></ruby>んでおくこと ＝ Membaca komik yang disuruh dosen untuk dibaca. ✓ (jawaban benar)",
+          "4. Mencari dan membaca komik yang belum pernah dibaca sendiri. (salah, bukan syarat \"belum pernah dibaca\", tapi komik yang DITENTUKAN dosen)"
+        ]
+      },
+      {
+        "stem": "<u>このときの私</u>は、どのような状態だったか。",
+        "opts": [
+          "ほかの試験の勉強がしたいのに、漫画を読まなければならなかった。",
+          "漫画が読みたいのに、試験の勉強をしなければならなかった。",
+          "好きな漫画が読みたいのに、好きではない漫画を読まなければならなかった。",
+          "試験の勉強をしなければならないのに、漫画を読むのを我慢できなかった。"
+        ],
+        "ans": 0,
+        "exp": "Teks menyatakan penulis harus membaca komik 3 jilid untuk ujian sehingga TIDAK BISA belajar untuk ujian lain (ほかの試験の勉強ができなくなり). Jadi penulis ingin belajar mata kuliah lain, tapi terpaksa membaca komik. Ini kebalikan dari kebiasaan biasanya (menahan diri dari komik saat ujian).",
+        "full": "<u>このときの私</u>は、どのような状態だったか。",
+        "ftr": "Di universitas tempat saya kuliah (sebagai mahasiswa asing) di Jepang, ada mata kuliah membaca komik sambil memikirkan tentang masyarakat. Karena saya sudah suka komik Jepang sejak kecil, saya mengambil mata kuliah ini. Tapi ternyata ini adalah kesalahan.\n\nDi kelas ini, sebelum kelas tiap minggu, mahasiswa harus membaca komik yang ditentukan dosen. Tapi komik-komik yang dibahas semuanya tidak saya kenal, jadi butuh waktu lama untuk membacanya, dan setiap minggu sangat berat.\n\nYang paling merepotkan adalah ujian akhir semester. Sebelum ujian, dosen menyuruh membaca sebuah komik terlebih dahulu. Komik itu totalnya 3 jilid, dan untuk membacanya dengan benar-benar butuh waktu sangat lama. Karena itu, saya jadi tidak bisa belajar untuk ujian lain, dan bahkan harus mengurangi waktu tidur. Biasanya, saat masa ujian saya menahan diri untuk tidak membaca komik, tapi saat itu justru sebaliknya.\n\nUjiannya berjalan lancar, tapi sekarang saya merasa ingin berhenti membaca komik untuk sementara waktu.",
+        "oi": [
+          "1. <ruby>ほか<rt>他</rt></ruby>の<ruby>試験<rt>しけん</rt></ruby>の<ruby>勉強<rt>べんきょう</rt></ruby>がしたいのに、<ruby>漫画<rt>まんが</rt></ruby>を<ruby>読<rt>よ</rt></ruby>まなければならなかった。 ＝ Ingin belajar untuk ujian lain, tapi terpaksa membaca komik. ✓ (jawaban benar)",
+          "2. Ingin membaca komik, tapi terpaksa belajar untuk ujian. (terbalik dari fakta cerita)",
+          "3. Ingin membaca komik favorit, tapi terpaksa membaca komik yang tidak disukai. (tidak disebutkan soal suka/tidak suka komik yang ditugaskan)",
+          "4. Harus belajar untuk ujian, tapi tidak bisa menahan diri membaca komik. (kurang tepat — bukan soal tidak bisa menahan diri, tapi memang DIWAJIBKAN membaca komik itu untuk ujian)"
+        ]
+      },
+      {
+        "stem": "「私」は今、どんな気持ちになっているか。",
+        "opts": [
+          "しばらくは、休みの日だけに漫画を読もう。",
+          "しばらくは、好きな漫画しか読みたくない。",
+          "しばらくは、我慢して漫画を読もう。",
+          "しばらくは、漫画は読みたくない。"
+        ],
+        "ans": 3,
+        "exp": "Kalimat penutup: \"今はしばらく漫画はお休みにしたい気分です\" (sekarang saya merasa ingin berhenti/istirahat dari komik untuk sementara). Jawaban 4 sesuai persis.",
+        "full": "「私」は今、どんな気持ちになっているか。",
+        "ftr": "Di universitas tempat saya kuliah (sebagai mahasiswa asing) di Jepang, ada mata kuliah membaca komik sambil memikirkan tentang masyarakat. Karena saya sudah suka komik Jepang sejak kecil, saya mengambil mata kuliah ini. Tapi ternyata ini adalah kesalahan.\n\nDi kelas ini, sebelum kelas tiap minggu, mahasiswa harus membaca komik yang ditentukan dosen. Tapi komik-komik yang dibahas semuanya tidak saya kenal, jadi butuh waktu lama untuk membacanya, dan setiap minggu sangat berat.\n\nYang paling merepotkan adalah ujian akhir semester. Sebelum ujian, dosen menyuruh membaca sebuah komik terlebih dahulu. Komik itu totalnya 3 jilid, dan untuk membacanya dengan benar-benar butuh waktu sangat lama. Karena itu, saya jadi tidak bisa belajar untuk ujian lain, dan bahkan harus mengurangi waktu tidur. Biasanya, saat masa ujian saya menahan diri untuk tidak membaca komik, tapi saat itu justru sebaliknya.\n\nUjiannya berjalan lancar, tapi sekarang saya merasa ingin berhenti membaca komik untuk sementara waktu.",
+        "oi": [
+          "1. Untuk sementara, hanya akan membaca komik di hari libur saja. (tidak disebutkan)",
+          "2. Untuk sementara, hanya ingin membaca komik favorit saja. (tidak disebutkan)",
+          "3. Untuk sementara, akan tetap membaca komik sambil menahan diri. (bertentangan, penulis justru ingin BERHENTI total sementara)",
+          "4. しばらくは、<ruby>漫画<rt>まんが</rt></ruby>は<ruby>読<rt>よ</rt></ruby>みたくない。 ＝ Untuk sementara, tidak ingin membaca komik sama sekali. ✓ (jawaban benar)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "category": "chobun",
+    "day": "課題3",
+    "passageTitle": "お年寄りのための靴",
+    "passage": "1年に2万<ruby>通<rt>つう</rt></ruby>も<ruby>感謝<rt>かんしゃ</rt></ruby>の手紙がくる会社がある。<br><br><ruby>四国<rt>しこく</rt></ruby>にある①<ruby>靴<rt>くつ</rt></ruby>の会社だ。初めはスリッパを作っていたのだが、約25年前、<ruby>お年寄<rt>としよ</rt></ruby>りのための<ruby>介護施設<rt>かいごしせつ</rt></ruby>の<ruby>経営者<rt>けいえいしゃ</rt></ruby>から、こんな<ruby>相談<rt>そうだん</rt></ruby>をされた。<br>「<ruby>施設内<rt>しせつない</rt></ruby>でお年寄りがよく<ruby>転<rt>ころ</rt></ruby>ぶので、困っているんです。いろいろ<ruby>工夫<rt>くふう</rt></ruby>しても<ruby>解決<rt>かいけつ</rt></ruby>できません。靴に問題がありそうなんです。」<br><br>それで、お年寄りのための<ruby>安全<rt>あんぜん</rt></ruby>な靴を作ることにしたそうだ。<ruby>社長<rt>しゃちょう</rt></ruby>はまず、約500人のお年寄りの<ruby>足<rt>あし</rt></ruby>を<ruby>観察<rt>かんさつ</rt></ruby>して、<ruby>歩<rt>ある</rt></ruby>き<ruby>方<rt>かた</rt></ruby>を<ruby>調査<rt>ちょうさ</rt></ruby>することにした。そうして作った靴を<ruby>履<rt>は</rt></ruby>いてもらい、<ruby>意見<rt>いけん</rt></ruby>を聞きながら<ruby>悪<rt>わる</rt></ruby>いところを<ruby>直<rt>なお</rt></ruby>していった。2年後、「お年寄りのための靴」が<ruby>完成<rt>かんせい</rt></ruby>したが、初めはあまり<ruby>売<rt>う</rt></ruby>れなかった。<br><br>そこで、②<ruby>調査結果<rt>ちょうさけっか</rt></ruby>をもう一度<ruby>確認<rt>かくにん</rt></ruby>することにした。すると、あることがわかった。お年寄りの中には年をとって<ruby>片方<rt>かたほう</rt></ruby>の足だけが悪くなったり、足の<ruby>形<rt>かたち</rt></ruby>が変わってしまい<ruby>左右<rt>さゆう</rt></ruby>の足の大きさが違ってきたりして、困っている人が少なくない。左右のセットではなく、片方の靴だけが必要な人もいるのだ。そこで、「お年寄りのための靴」を片方でも買えるようにした。<br><br>靴の会社を<ruby>経営<rt>けいえい</rt></ruby>しているある<ruby>先輩<rt>せんぱい</rt></ruby>からは、③そんなことをしたら<ruby>経営<rt>けいえい</rt></ruby>がうまくいかなくなると<ruby>反対<rt>はんたい</rt></ruby>されたが、<ruby>社長<rt>しゃちょう</rt></ruby>はこの新しい<ruby>販売方法<rt>はんばいほうほう</rt></ruby>を<ruby>実行<rt>じっこう</rt></ruby>した。困っている人の問題を<ruby>解決<rt>かいけつ</rt></ruby>するためにいいものを作り、今までその靴の<ruby>売<rt>う</rt></ruby>り<ruby>方<rt>かた</rt></ruby>とは全く違った<ruby>売<rt>う</rt></ruby>り<ruby>方<rt>かた</rt></ruby>で、それが必要な人のところに<ruby>届<rt>とど</rt></ruby>けようとしたのである。<br><br>今では、この靴は1年に100万<ruby>足<rt>そく</rt></ruby>以上も<ruby>売<rt>う</rt></ruby>れている。2万<ruby>通<rt>つう</rt></ruby>も<ruby>感謝<rt>かんしゃ</rt></ruby>の手紙がくるのは、④このような会社の<ruby>姿勢<rt>しせい</rt></ruby>とあるからではないだろうか。",
+    "questions": [
+      {
+        "stem": "①靴の会社は、どうしてお年寄りのための靴を作ることにしたか。",
+        "opts": [
+          "お年寄りから、いい靴を作ってほしいという手紙がたくさんきたから",
+          "お年寄りが室内でスリッパを履かなくなり、靴を履くようになったから",
+          "お年寄りのための介護施設の経営者から、靴について相談されたから",
+          "お年寄りの歩き方を調査して、靴の問題点を見つけたから"
+        ],
+        "ans": 2,
+        "exp": "Awal cerita menyebutkan pengelola panti lansia berkonsultasi tentang lansia yang sering jatuh, dan menduga masalahnya ada di sepatu. Itulah yang jadi pemicu awal (bukan hasil penelitian, karena penelitian baru dilakukan SETELAH konsultasi ini).",
+        "full": "①<ruby>靴<rt>くつ</rt></ruby>の<ruby>会社<rt>かいしゃ</rt></ruby>は、どうしてお<ruby>年寄<rt>としよ</rt></ruby>りのための<ruby>靴<rt>くつ</rt></ruby>を<ruby>作<rt>つく</rt></ruby>ることにしたか。",
+        "ftr": "Ada sebuah perusahaan yang menerima sampai 20.000 surat ucapan terima kasih dalam setahun.\n\nItu adalah ①perusahaan sepatu di Shikoku. Awalnya mereka membuat sandal rumah (slipper), tapi sekitar 25 tahun lalu, pengelola panti perawatan lansia berkonsultasi begini: \"Di dalam panti, lansia sering terjatuh, kami kebingungan. Sudah dicoba berbagai cara tapi tidak terpecahkan. Sepertinya masalahnya ada pada sepatu.\"\n\nKarena itu, perusahaan memutuskan membuat sepatu aman untuk lansia. Direktur pertama-tama mengamati kaki sekitar 500 lansia dan meneliti cara jalan mereka. Sepatu yang dibuat dicobakan, lalu diperbaiki berdasarkan masukan. Dua tahun kemudian, \"Sepatu untuk Lansia\" selesai dibuat, tapi awalnya kurang laku.\n\nMaka, mereka memutuskan ②mengecek ulang hasil penelitian tersebut. Ternyata ditemukan fakta: banyak lansia yang salah satu kakinya saja memburuk karena usia, atau bentuk kakinya berubah sehingga ukuran kaki kiri-kanan jadi berbeda. Bukan sedikit yang hanya butuh SATU sepatu saja (bukan sepasang). Maka, \"Sepatu untuk Lansia\" dibuat bisa dibeli SATU SEBELAH saja.\n\nSeorang senior pengusaha sepatu menentang, bilang ③\"hal seperti itu\" akan membuat bisnis tidak berjalan baik. Tapi direktur tetap menjalankan metode penjualan baru ini. Ia membuat produk bagus untuk memecahkan masalah orang yang kesulitan, dan mengantarkannya dengan cara jual yang sama sekali berbeda dari biasanya kepada orang yang membutuhkannya.\n\nSekarang, sepatu ini terjual lebih dari 1 juta pasang per tahun. Datangnya 20.000 surat terima kasih setiap tahun, bukankah karena ④sikap perusahaan seperti inilah penyebabnya?",
+        "oi": [
+          "1. Karena banyak surat dari lansia yang minta dibuatkan sepatu bagus. (tidak disebutkan)",
+          "2. Karena lansia berhenti memakai sandal di dalam ruangan dan mulai memakai sepatu. (tidak sesuai, justru sebaliknya, masalahnya ada di sandal/sepatu yang dipakai)",
+          "3. お<ruby>年寄<rt>としよ</rt></ruby>りのための<ruby>介護施設<rt>かいごしせつ</rt></ruby>の<ruby>経営者<rt>けいえいしゃ</rt></ruby>から、<ruby>靴<rt>くつ</rt></ruby>について<ruby>相談<rt>そうだん</rt></ruby>されたから ＝ Karena dikonsultasikan soal sepatu oleh pengelola panti lansia. ✓ (jawaban benar)",
+          "4. Karena meneliti cara jalan lansia dan menemukan masalah sepatu. (ini terjadi SETELAH keputusan dibuat, bukan alasan awal keputusan)"
+        ]
+      },
+      {
+        "stem": "②調査結果をもう一度確認することにしたとあるが、その結果、例えばどんなことがわかったか。",
+        "opts": [
+          "お年寄りには、転びやすい人がいること",
+          "お年寄りには、靴の値段が高いと思っている人がいること",
+          "お年寄りになると、靴を履く機会が減る人がいること",
+          "お年寄りになると、右と左で足の形が変わる人がいること"
+        ],
+        "ans": 3,
+        "exp": "Hasil pengecekan ulang: ada lansia yang bentuk kakinya berubah sehingga ukuran kaki kiri-kanan jadi berbeda (足の形が変わってしまい左右の足の大きさが違ってきたり). Jawaban 4 sesuai.",
+        "full": "②<ruby>調査結果<rt>ちょうさけっか</rt></ruby>をもう<ruby>一度<rt>いちど</rt></ruby><ruby>確認<rt>かくにん</rt></ruby>することにしたとあるが、その<ruby>結果<rt>けっか</rt></ruby>、<ruby>例<rt>たと</rt></ruby>えばどんなことがわかったか。",
+        "ftr": "Ada sebuah perusahaan yang menerima sampai 20.000 surat ucapan terima kasih dalam setahun.\n\nItu adalah ①perusahaan sepatu di Shikoku. Awalnya mereka membuat sandal rumah (slipper), tapi sekitar 25 tahun lalu, pengelola panti perawatan lansia berkonsultasi begini: \"Di dalam panti, lansia sering terjatuh, kami kebingungan. Sudah dicoba berbagai cara tapi tidak terpecahkan. Sepertinya masalahnya ada pada sepatu.\"\n\nKarena itu, perusahaan memutuskan membuat sepatu aman untuk lansia. Direktur pertama-tama mengamati kaki sekitar 500 lansia dan meneliti cara jalan mereka. Sepatu yang dibuat dicobakan, lalu diperbaiki berdasarkan masukan. Dua tahun kemudian, \"Sepatu untuk Lansia\" selesai dibuat, tapi awalnya kurang laku.\n\nMaka, mereka memutuskan ②mengecek ulang hasil penelitian tersebut. Ternyata ditemukan fakta: banyak lansia yang salah satu kakinya saja memburuk karena usia, atau bentuk kakinya berubah sehingga ukuran kaki kiri-kanan jadi berbeda. Bukan sedikit yang hanya butuh SATU sepatu saja (bukan sepasang). Maka, \"Sepatu untuk Lansia\" dibuat bisa dibeli SATU SEBELAH saja.\n\nSeorang senior pengusaha sepatu menentang, bilang ③\"hal seperti itu\" akan membuat bisnis tidak berjalan baik. Tapi direktur tetap menjalankan metode penjualan baru ini. Ia membuat produk bagus untuk memecahkan masalah orang yang kesulitan, dan mengantarkannya dengan cara jual yang sama sekali berbeda dari biasanya kepada orang yang membutuhkannya.\n\nSekarang, sepatu ini terjual lebih dari 1 juta pasang per tahun. Datangnya 20.000 surat terima kasih setiap tahun, bukankah karena ④sikap perusahaan seperti inilah penyebabnya?",
+        "oi": [
+          "1. Ada lansia yang mudah terjatuh. (ini fakta di awal cerita, bukan hasil pengecekan ulang kedua)",
+          "2. Ada lansia yang berpikir harga sepatu mahal. (tidak disebutkan sama sekali)",
+          "3. Semakin tua, ada orang yang kesempatan memakai sepatunya berkurang. (tidak sesuai, bukan ini yang ditemukan)",
+          "4. お<ruby>年寄<rt>としよ</rt></ruby>りになると、<ruby>右<rt>みぎ</rt></ruby>と<ruby>左<rt>ひだり</rt></ruby>で<ruby>足<rt>あし</rt></ruby>の<ruby>形<rt>かたち</rt></ruby>が<ruby>変<rt>か</rt></ruby>わる<ruby>人<rt>ひと</rt></ruby>がいること ＝ Ada lansia yang bentuk kaki kanan-kirinya berubah beda. ✓ (jawaban benar)"
+        ]
+      },
+      {
+        "stem": "③そんなこととあるが、それは何か。",
+        "opts": [
+          "調査にお金をかけること",
+          "左右の大きさが同じ靴だけを売ること",
+          "「お年寄りのための靴」だけを作ること",
+          "片方ずつでも靴を売ること"
+        ],
+        "ans": 3,
+        "exp": "「そんなこと」merujuk pada kebijakan menjual sepatu SATU SEBELAH saja (片方でも買えるようにした) yang baru disebutkan di paragraf sebelumnya — inilah yang ditentang senior pengusaha sepatu karena dianggap merusak bisnis.",
+        "full": "③<u>そんなこと</u>とあるが、それは何か。",
+        "ftr": "Ada sebuah perusahaan yang menerima sampai 20.000 surat ucapan terima kasih dalam setahun.\n\nItu adalah ①perusahaan sepatu di Shikoku. Awalnya mereka membuat sandal rumah (slipper), tapi sekitar 25 tahun lalu, pengelola panti perawatan lansia berkonsultasi begini: \"Di dalam panti, lansia sering terjatuh, kami kebingungan. Sudah dicoba berbagai cara tapi tidak terpecahkan. Sepertinya masalahnya ada pada sepatu.\"\n\nKarena itu, perusahaan memutuskan membuat sepatu aman untuk lansia. Direktur pertama-tama mengamati kaki sekitar 500 lansia dan meneliti cara jalan mereka. Sepatu yang dibuat dicobakan, lalu diperbaiki berdasarkan masukan. Dua tahun kemudian, \"Sepatu untuk Lansia\" selesai dibuat, tapi awalnya kurang laku.\n\nMaka, mereka memutuskan ②mengecek ulang hasil penelitian tersebut. Ternyata ditemukan fakta: banyak lansia yang salah satu kakinya saja memburuk karena usia, atau bentuk kakinya berubah sehingga ukuran kaki kiri-kanan jadi berbeda. Bukan sedikit yang hanya butuh SATU sepatu saja (bukan sepasang). Maka, \"Sepatu untuk Lansia\" dibuat bisa dibeli SATU SEBELAH saja.\n\nSeorang senior pengusaha sepatu menentang, bilang ③\"hal seperti itu\" akan membuat bisnis tidak berjalan baik. Tapi direktur tetap menjalankan metode penjualan baru ini. Ia membuat produk bagus untuk memecahkan masalah orang yang kesulitan, dan mengantarkannya dengan cara jual yang sama sekali berbeda dari biasanya kepada orang yang membutuhkannya.\n\nSekarang, sepatu ini terjual lebih dari 1 juta pasang per tahun. Datangnya 20.000 surat terima kasih setiap tahun, bukankah karena ④sikap perusahaan seperti inilah penyebabnya?",
+        "oi": [
+          "1. Menghabiskan banyak uang untuk penelitian. (tidak sesuai konteks)",
+          "2. Hanya menjual sepatu yang ukuran kiri-kanannya sama. (justru kebalikan dari kebijakan baru)",
+          "3. Hanya membuat \"Sepatu untuk Lansia\" saja (tidak produk lain). (tidak sesuai konteks paragraf ini)",
+          "4. <ruby>片方<rt>かたほう</rt></ruby>ずつでも<ruby>靴<rt>くつ</rt></ruby>を<ruby>売<rt>う</rt></ruby>ること ＝ Menjual sepatu satu sebelah-sebelah saja (tidak harus sepasang). ✓ (jawaban benar)"
+        ]
+      },
+      {
+        "stem": "④このような会社とあるが、どのようなものか。",
+        "opts": [
+          "困っている人のことを一生懸命に考えて、商品を作って売ること",
+          "自分の会社の商品の良さを信じて、売れなくても商品を売り続けること",
+          "人がしないことを探して、周りの人に反対されても実行すること",
+          "客のことをよくわかっている社員だけで、いいものを作り続けること"
+        ],
+        "ans": 0,
+        "exp": "Kesimpulan esai: perusahaan ini membuat produk yang benar-benar memikirkan orang yang kesulitan (困っている人の問題を解決するためにいいものを作り) dan mengantarkannya dengan cara baru kepada yang membutuhkan — inilah \"sikap\" yang membuat banyak orang berterima kasih.",
+        "full": "④このような<ruby>会社<rt>かいしゃ</rt></ruby>とあるが、どのようなものか。",
+        "ftr": "Ada sebuah perusahaan yang menerima sampai 20.000 surat ucapan terima kasih dalam setahun.\n\nItu adalah ①perusahaan sepatu di Shikoku. Awalnya mereka membuat sandal rumah (slipper), tapi sekitar 25 tahun lalu, pengelola panti perawatan lansia berkonsultasi begini: \"Di dalam panti, lansia sering terjatuh, kami kebingungan. Sudah dicoba berbagai cara tapi tidak terpecahkan. Sepertinya masalahnya ada pada sepatu.\"\n\nKarena itu, perusahaan memutuskan membuat sepatu aman untuk lansia. Direktur pertama-tama mengamati kaki sekitar 500 lansia dan meneliti cara jalan mereka. Sepatu yang dibuat dicobakan, lalu diperbaiki berdasarkan masukan. Dua tahun kemudian, \"Sepatu untuk Lansia\" selesai dibuat, tapi awalnya kurang laku.\n\nMaka, mereka memutuskan ②mengecek ulang hasil penelitian tersebut. Ternyata ditemukan fakta: banyak lansia yang salah satu kakinya saja memburuk karena usia, atau bentuk kakinya berubah sehingga ukuran kaki kiri-kanan jadi berbeda. Bukan sedikit yang hanya butuh SATU sepatu saja (bukan sepasang). Maka, \"Sepatu untuk Lansia\" dibuat bisa dibeli SATU SEBELAH saja.\n\nSeorang senior pengusaha sepatu menentang, bilang ③\"hal seperti itu\" akan membuat bisnis tidak berjalan baik. Tapi direktur tetap menjalankan metode penjualan baru ini. Ia membuat produk bagus untuk memecahkan masalah orang yang kesulitan, dan mengantarkannya dengan cara jual yang sama sekali berbeda dari biasanya kepada orang yang membutuhkannya.\n\nSekarang, sepatu ini terjual lebih dari 1 juta pasang per tahun. Datangnya 20.000 surat terima kasih setiap tahun, bukankah karena ④sikap perusahaan seperti inilah penyebabnya?",
+        "oi": [
+          "1. <ruby>困<rt>こま</rt></ruby>っている<ruby>人<rt>ひと</rt></ruby>のことを<ruby>一生懸命<rt>いっしょうけんめい</rt></ruby>に<ruby>考<rt>かんが</rt></ruby>えて、<ruby>商品<rt>しょうひん</rt></ruby>を<ruby>作<rt>つく</rt></ruby>って<ruby>売<rt>う</rt></ruby>ること ＝ Sungguh-sungguh memikirkan orang yang kesulitan lalu membuat & menjual produk untuk mereka. ✓ (jawaban benar)",
+          "2. Percaya pada kualitas produk sendiri, tetap menjual meski tidak laku. (terlalu sempit, tidak mencakup poin \"memikirkan orang kesulitan\")",
+          "3. Mencari hal yang tidak dilakukan orang lain, tetap melaksanakan meski ditentang. (ini hanya sebagian gambaran cerita, bukan simpulan utuh sikap perusahaan)",
+          "4. Hanya karyawan yang paham pelanggan yang terus membuat produk bagus. (tidak sesuai, tidak dibahas soal seleksi karyawan)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "category": "chubun",
+    "day": "課題4",
+    "passageTitle": "課長とピアノ教室",
+    "passage": "<ruby>昨日<rt>きのう</rt></ruby>、<ruby>会社<rt>かいしゃ</rt></ruby>のみんなで<ruby>昼<rt>ひる</rt></ruby>ご<ruby>飯<rt>はん</rt></ruby>を食べに行きました。<ruby>料理<rt>りょうり</rt></ruby>を<ruby>待<rt>ま</rt></ruby>っている間、<ruby>課長<rt>かちょう</rt></ruby>がずっとテーブルの上で<ruby>指<rt>ゆび</rt></ruby>を動かしていました。私が「<ruby>指<rt>ゆび</rt></ruby>の<ruby>体操<rt>たいそう</rt></ruby>ですか。」と<ruby>尋<rt>たず</rt></ruby>ねると、「<ruby>実<rt>じつ</rt></ruby>は、ピアノを<ruby>習<rt>なら</rt></ruby>い始めたんだよ。うまく<ruby>指<rt>ゆび</rt></ruby>が動かなくてね。<ruby>暇<rt>ひま</rt></ruby>があると、つい<ruby>練習<rt>れんしゅう</rt></ruby>してしまうんだ。」と楽しそうに話してくれました。<br><br><ruby>課長<rt>かちょう</rt></ruby>は、最近、朝から<ruby>晩<rt>ばん</rt></ruby>まで<ruby>仕事<rt>しごと</rt></ruby>のことばかり考えている自分に<ruby>気<rt>き</rt></ruby>づき、これではよくないと考えて、何か新しいことをやってみたいと思ったそうです。そんなときに、近所で「大人のためのピアノ<ruby>教室<rt>きょうしつ</rt></ruby>」を見つけ、子供のころ<ruby>習<rt>なら</rt></ruby>いたかったことを思い出して、行ってみたのだそうです。<ruby>課長<rt>かちょう</rt></ruby>はうれしそうに「新しいことを始めるのは<ruby>大変<rt>たいへん</rt></ruby>だったけれど、毎日楽しいし、前より<ruby>仕事<rt>しごと</rt></ruby>もうまくいくようになった<ruby>気<rt>き</rt></ruby>がするんだよ。」と言っていました。<br><br><ruby>課長<rt>かちょう</rt></ruby>の話を聞いて、私も何かやりたくなりました。<ruby>実<rt>じつ</rt></ruby>は、子供のころからバレエを<ruby>習<rt>なら</rt></ruby>いたいと思っていたので、私も（　）つもりです。",
+    "questions": [
+      {
+        "stem": "<u>ずっとテーブルの上で指を動かしていました</u>とあるが、なぜか。",
+        "opts": [
+          "料理を注文するために、店の人を呼びたかったから",
+          "ずっと前に注文した料理が、なかなか来なくて怒っていたから",
+          "指がよく動くようになってから、ピアノを習い始めようと思っていたから",
+          "ピアノがうまくなるように、指を動かす練習をしたかったから"
+        ],
+        "ans": 3,
+        "exp": "Kepala bagian sendiri menjelaskan: \"ピアノを習い始めたんだよ。うまく指が動かなくてね。暇があると、つい練習してしまう\" — ia sedang berlatih menggerakkan jari agar mahir bermain piano.",
+        "full": "<u>ずっとテーブルの<ruby>上<rt>うえ</rt></ruby>で<ruby>指<rt>ゆび</rt></ruby>を<ruby>動<rt>うご</rt></ruby>かしていました</u>とあるが、なぜか。",
+        "ftr": "Kemarin, kami semua di kantor pergi makan siang bersama. Sambil menunggu makanan, kepala bagian (kacho) terus-menerus menggerakkan jarinya di atas meja. Ketika saya bertanya \"Apakah itu senam jari?\", ia bercerita dengan gembira, \"Sebenarnya, aku baru mulai belajar piano. Jariku belum bisa bergerak dengan lancar. Kalau ada waktu luang, aku jadi tanpa sadar berlatih terus.\"\n\nKatanya, kepala bagian belakangan menyadari dirinya selalu memikirkan pekerjaan dari pagi sampai malam, dan berpikir ini tidak baik, sehingga ingin mencoba hal baru. Saat itulah ia menemukan \"kelas piano untuk dewasa\" di dekat rumahnya, teringat bahwa dulu waktu kecil ingin belajar piano, dan mencoba pergi ke sana. Kepala bagian berkata dengan senang, \"Memulai hal baru memang berat, tapi setiap hari jadi menyenangkan, dan aku merasa pekerjaanku jadi lebih lancar dari sebelumnya.\"\n\nSetelah mendengar cerita kepala bagian, saya juga jadi ingin melakukan sesuatu. Sebenarnya, sejak kecil saya ingin belajar balet, jadi saya berencana [___].",
+        "oi": [
+          "1. Ingin memanggil pelayan untuk memesan makanan. (tidak sesuai)",
+          "2. Marah karena makanan yang dipesan lama tidak datang. (tidak sesuai, kacho justru bercerita dengan senang, bukan marah)",
+          "3. Berencana mulai belajar piano SETELAH jarinya bisa bergerak lancar. (terbalik — ia SUDAH mulai belajar piano, dan sedang berlatih agar jarinya lancar)",
+          "4. ピアノがうまくなるように、<ruby>指<rt>ゆび</rt></ruby>を<ruby>動<rt>うご</rt></ruby>かす<ruby>練習<rt>れんしゅう</rt></ruby>をしたかったから ＝ Karena ingin berlatih menggerakkan jari agar piano-nya mahir. ✓ (jawaban benar)"
+        ]
+      },
+      {
+        "stem": "課長は、なぜ最近、新しいことをやってみたいと思ったのか。",
+        "opts": [
+          "以前よりも、仕事が少し暇になってきたから",
+          "仕事のことばかり考えているのは、よくないと思ったから",
+          "新しいことを始めると、もっと仕事がうまくいくようになると思ったから",
+          "自分の子供と一緒に、何かを始めたくなったから"
+        ],
+        "ans": 1,
+        "exp": "Teks: \"朝から晩まで仕事のことばかり考えている自分に気づき、これではよくないと考えて\" — ia menyadari terlalu terpaku pada pekerjaan dan berpikir itu tidak baik, itulah alasannya ingin mencoba hal baru.",
+        "full": "<ruby>課長<rt>かちょう</rt></ruby>は、なぜ<ruby>最近<rt>さいきん</rt></ruby>、<ruby>新<rt>あたら</rt></ruby>しいことをやってみたいと<ruby>思<rt>おも</rt></ruby>ったのか。",
+        "ftr": "Kemarin, kami semua di kantor pergi makan siang bersama. Sambil menunggu makanan, kepala bagian (kacho) terus-menerus menggerakkan jarinya di atas meja. Ketika saya bertanya \"Apakah itu senam jari?\", ia bercerita dengan gembira, \"Sebenarnya, aku baru mulai belajar piano. Jariku belum bisa bergerak dengan lancar. Kalau ada waktu luang, aku jadi tanpa sadar berlatih terus.\"\n\nKatanya, kepala bagian belakangan menyadari dirinya selalu memikirkan pekerjaan dari pagi sampai malam, dan berpikir ini tidak baik, sehingga ingin mencoba hal baru. Saat itulah ia menemukan \"kelas piano untuk dewasa\" di dekat rumahnya, teringat bahwa dulu waktu kecil ingin belajar piano, dan mencoba pergi ke sana. Kepala bagian berkata dengan senang, \"Memulai hal baru memang berat, tapi setiap hari jadi menyenangkan, dan aku merasa pekerjaanku jadi lebih lancar dari sebelumnya.\"\n\nSetelah mendengar cerita kepala bagian, saya juga jadi ingin melakukan sesuatu. Sebenarnya, sejak kecil saya ingin belajar balet, jadi saya berencana [___].",
+        "oi": [
+          "1. Karena pekerjaan jadi agak lebih senggang dari sebelumnya. (tidak disebutkan)",
+          "2. <ruby>仕事<rt>しごと</rt></ruby>のことばかり<ruby>考<rt>かんが</rt></ruby>えているのは、よくないと<ruby>思<rt>おも</rt></ruby>ったから ＝ Karena berpikir tidak baik terus-menerus hanya memikirkan pekerjaan. ✓ (jawaban benar)",
+          "3. Karena berpikir memulai hal baru akan membuat pekerjaan lebih lancar. (ini hasil yang dirasakan BELAKANGAN, bukan alasan awal memulai)",
+          "4. Karena ingin memulai sesuatu bersama anaknya. (tidak disebutkan sama sekali soal anak)"
+        ]
+      },
+      {
+        "stem": "（　）に入れるのに最もよいものはどれか。",
+        "opts": [
+          "バレエ教室を探す",
+          "ピアノ教室を探す",
+          "仕事を早く終わらせる",
+          "何かやりたいことを見つける"
+        ],
+        "ans": 0,
+        "exp": "Kalimat sebelumnya: \"子供のころからバレエを習いたいと思っていたので\" (sejak kecil ingin belajar balet). Maka niat penulis yang wajar adalah mencari kelas balet, meniru langkah kacho mencari kelas pianonya.",
+        "full": "（　）に<ruby>入<rt>い</rt></ruby>のに<ruby>最<rt>もっと</rt></ruby>のはどれか。",
+        "ftr": "Kemarin, kami semua di kantor pergi makan siang bersama. Sambil menunggu makanan, kepala bagian (kacho) terus-menerus menggerakkan jarinya di atas meja. Ketika saya bertanya \"Apakah itu senam jari?\", ia bercerita dengan gembira, \"Sebenarnya, aku baru mulai belajar piano. Jariku belum bisa bergerak dengan lancar. Kalau ada waktu luang, aku jadi tanpa sadar berlatih terus.\"\n\nKatanya, kepala bagian belakangan menyadari dirinya selalu memikirkan pekerjaan dari pagi sampai malam, dan berpikir ini tidak baik, sehingga ingin mencoba hal baru. Saat itulah ia menemukan \"kelas piano untuk dewasa\" di dekat rumahnya, teringat bahwa dulu waktu kecil ingin belajar piano, dan mencoba pergi ke sana. Kepala bagian berkata dengan senang, \"Memulai hal baru memang berat, tapi setiap hari jadi menyenangkan, dan aku merasa pekerjaanku jadi lebih lancar dari sebelumnya.\"\n\nSetelah mendengar cerita kepala bagian, saya juga jadi ingin melakukan sesuatu. Sebenarnya, sejak kecil saya ingin belajar balet, jadi saya berencana [___].",
+        "oi": [
+          "1. バレエ<ruby>教室<rt>きょうしつ</rt></ruby>を<ruby>探<rt>さが</rt></ruby>す ＝ Mencari kelas balet. ✓ (jawaban benar)",
+          "2. Mencari kelas piano. (salah, yang diinginkan penulis sejak kecil adalah balet, bukan piano)",
+          "3. Menyelesaikan pekerjaan lebih cepat. (tidak relevan dengan konteks \"ingin belajar balet sejak kecil\")",
+          "4. Menemukan sesuatu yang ingin dilakukan. (salah, penulis SUDAH tahu yang diinginkan yaitu balet, bukan sedang mencari-cari)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "category": "tanbun",
+    "day": "課題5",
+    "passageTitle": "短文3つ（引っ越し・メール・喫茶店）",
+    "multi_passage": true,
+    "questions": [
+      {
+        "passage": "<ruby>先月<rt>せんげつ</rt></ruby><ruby>引<rt>ひ</rt></ruby>っ<ruby>越<rt>こ</rt></ruby>しをした。その<ruby>時<rt>とき</rt></ruby>、<ruby>引<rt>ひ</rt></ruby>っ<ruby>越<rt>こ</rt></ruby>し<ruby>会社<rt>がいしゃ</rt></ruby>の人が「<ruby>荷物<rt>にもつ</rt></ruby>はこれに入れてください。」と言って持ってきたのは、白いダンボール<ruby>箱<rt>ばこ</rt></ruby>だった。私は<ruby>何度<rt>なんど</rt></ruby>も<ruby>引<rt>ひ</rt></ruby>っ<ruby>越<rt>こ</rt></ruby>しをしたが、今まで<ruby>頼<rt>たの</rt></ruby>んだ<ruby>引<rt>ひ</rt></ruby>っ<ruby>越<rt>こ</rt></ruby>し<ruby>会社<rt>がいしゃ</rt></ruby>が持ってきたダンボール<ruby>箱<rt>ばこ</rt></ruby>は、いつも<ruby>茶色<rt>ちゃいろ</rt></ruby>だった。白はきれいだけど、<ruby>汚<rt>よご</rt></ruby>れやすい。どうしてだろうと<ruby>思<rt>おも</rt></ruby>って聞いてみた。<ruby>同<rt>おな</rt></ruby>じ<ruby>重<rt>おも</rt></ruby>さの<ruby>荷物<rt>にもつ</rt></ruby>でも、白だとほかの<ruby>色<rt>いろ</rt></ruby>より<ruby>軽<rt>かる</rt></ruby>く<ruby>感<rt>かん</rt></ruby>じるのだそうだ。なるほど、<ruby>重<rt>おも</rt></ruby>い<ruby>荷物<rt>にもつ</rt></ruby>を<ruby>運<rt>はこ</rt></ruby>ぶ<ruby>仕事<rt>しごと</rt></ruby>をやりやすくする<ruby>工夫<rt>くふう</rt></ruby>だったのだ。",
+        "passageTitle": "(1) 引っ越しのダンボール箱",
+        "stem": "引っ越し会社の人によると、白い箱を使うのはどうしてか。",
+        "opts": [
+          "白い箱のほうが茶色い箱より軽く作られているから",
+          "白い箱は茶色い箱よりきれいに見えるから",
+          "白はほかの色より荷物の汚れがわかりやすい色だから",
+          "白はほかの色より荷物が軽いと感じる色だから"
+        ],
+        "ans": 3,
+        "exp": "Penjelasan orang jasa pindahan: \"同じ重さの荷物でも、白だとほかの色より軽く感じる\" (dengan berat sama, putih terasa lebih ringan). Ini soal KESAN/PERSEPSI berat, bukan berat sebenarnya kotaknya.",
+        "full": "<ruby>引<rt>ひ</rt></ruby>っ<ruby>越<rt>こ</rt></ruby>し<ruby>会社<rt>がいしゃ</rt></ruby>の<ruby>人<rt>ひと</rt></ruby>によると、<ruby>白<rt>しろ</rt></ruby>い<ruby>箱<rt>はこ</rt></ruby>を<ruby>使<rt>つか</rt></ruby>うのはどうしてか。",
+        "ftr": "Bulan lalu saya pindah rumah. Saat itu, orang dari perusahaan jasa pindahan membawa kotak kardus PUTIH sambil bilang \"Silakan masukkan barang ke sini.\" Saya sudah berkali-kali pindah rumah, tapi kotak kardus dari perusahaan jasa pindahan yang selama ini saya pakai selalu berwarna COKELAT. Putih memang terlihat bersih, tapi mudah kotor. Saya penasaran kenapa, lalu bertanya. Ternyata, dengan berat barang yang sama, warna putih terasa lebih RINGAN dibanding warna lain. Oh begitu, ternyata itu adalah trik agar pekerjaan mengangkut barang berat jadi lebih mudah (secara psikologis terasa lebih ringan).",
+        "oi": [
+          "1. Kotak putih dibuat lebih ringan secara fisik daripada kotak cokelat. (salah, ini soal kesan/perasaan, bukan berat fisik kotak itu sendiri)",
+          "2. Kotak putih terlihat lebih bersih daripada kotak cokelat. (tidak sesuai, meski disebutkan putih memang \"きれい\", itu bukan alasan UTAMA yang dijelaskan orang jasa pindahan)",
+          "3. Putih adalah warna yang membuat kotoran barang lebih mudah terlihat. (salah, justru sebaliknya — putih \"汚れやすい\"/mudah kotor disebutkan sebagai kekurangan, bukan alasan pemakaiannya)",
+          "4. <ruby>白<rt>しろ</rt></ruby>はほかの<ruby>色<rt>いろ</rt></ruby>より<ruby>荷物<rt>にもつ</rt></ruby>が<ruby>軽<rt>かる</rt></ruby>いと<ruby>感<rt>かん</rt></ruby>じる<ruby>色<rt>いろ</rt></ruby>だから ＝ Karena putih adalah warna yang membuat barang terasa lebih ringan dibanding warna lain. ✓ (jawaban benar)"
+        ]
+      },
+      {
+        "passage": "<ruby>以下<rt>いか</rt></ruby>は<ruby>会社<rt>かいしゃ</rt></ruby>の<ruby>先輩<rt>せんぱい</rt></ruby>からキムさんに<ruby>届<rt>とど</rt></ruby>いたメールである。<br><br>キムさん<br>5<ruby>日<rt>にち</rt></ruby>の<ruby>商品説明会<rt>しょうひんせつめいかい</rt></ruby>の<ruby>資料<rt>しりょう</rt></ruby>について、お<ruby>願<rt>ねが</rt></ruby>いがあります。<br><ruby>実<rt>じつ</rt></ruby>は、<ruby>今日<rt>きょう</rt></ruby>から4<ruby>日<rt>にち</rt></ruby>まで2<ruby>泊<rt>はく</rt></ruby>3<ruby>日<rt>にち</rt></ruby>の<ruby>急<rt>きゅう</rt></ruby>な<ruby>出張<rt>しゅっちょう</rt></ruby>が<ruby>入<rt>はい</rt></ruby>り、今、<ruby>新幹線<rt>しんかんせん</rt></ruby>に<ruby>乗<rt>の</rt></ruby>っています。私が、キムさんが今作っている<ruby>資料<rt>しりょう</rt></ruby>と私の<ruby>資料<rt>しりょう</rt></ruby>を<ruby>一<rt>ひと</rt></ruby>つにして<ruby>完成<rt>かんせい</rt></ruby>させ、<ruby>印刷<rt>いんさつ</rt></ruby>する<ruby>予定<rt>よてい</rt></ruby>でしたが、できなくなりました。このメールと<ruby>一緒<rt>いっしょ</rt></ruby>に私の<ruby>資料<rt>しりょう</rt></ruby>を<ruby>送<rt>おく</rt></ruby>りますので、私の<ruby>代<rt>か</rt></ruby>わりに<ruby>完成<rt>かんせい</rt></ruby>させて、<ruby>必要<rt>ひつよう</rt></ruby>な<ruby>人数分<rt>にんずうぶん</rt></ruby>を<ruby>印刷<rt>いんさつ</rt></ruby>しておいてください。<br>もし、<ruby>印刷<rt>いんさつ</rt></ruby>の<ruby>前<rt>まえ</rt></ruby>に私がキムさんの<ruby>資料<rt>しりょう</rt></ruby>をチェックしたほうがいい<ruby>場合<rt>ばあい</rt></ruby>は、<ruby>明日<rt>あした</rt></ruby>（3<ruby>日<rt>にち</rt></ruby>）の<ruby>夜<rt>よる</rt></ruby>までにメールで<ruby>送<rt>おく</rt></ruby>ってください。<br>よろしくお<ruby>願<rt>ねが</rt></ruby>いします。<br>田中",
+        "passageTitle": "(2) 田中さんからのメール",
+        "stem": "キムさんがこのメールで頼まれていることはどれか。",
+        "opts": [
+          "田中さんが出張に行く前に自分の資料を完成させ、必要な人数分を印刷すること",
+          "自分と田中さんの資料を一つにして完成させ、必要な人数分を印刷すること",
+          "田中さんの資料に問題がないかどうかチェックして、資料を完成させること",
+          "自分の資料が完成したら、3日の夜までに田中さんにメールで送ること"
+        ],
+        "ans": 1,
+        "exp": "Inti email: Tanaka semula berencana menggabungkan materi Kim dengan materinya sendiri, menyelesaikan, dan mencetak — tapi karena dinas mendadak, ia minta Kim melakukan itu SEBAGAI GANTI dirinya (私の代わりに完成させて、必要な人数分を印刷しておいてください).",
+        "full": "キムさんがこのメールで<ruby>頼<rt>たの</rt></ruby>まれていることはどれか。",
+        "ftr": "Berikut adalah email dari senior di kantor kepada Kim-san.\n\nKim-san,\nSaya mau minta tolong soal materi untuk sesi presentasi produk tanggal 5.\nSebenarnya, mulai hari ini sampai tanggal 4 ada dinas mendadak 3 hari 2 malam, dan sekarang saya sedang di Shinkansen. Rencananya saya yang akan menggabungkan materi yang sedang Kim-san buat dengan materi saya, menyelesaikannya, lalu mencetaknya — tapi jadi tidak bisa saya lakukan. Saya kirimkan materi saya bersama email ini, jadi tolong selesaikan (gabungkan) sebagai pengganti saya, lalu cetak sejumlah orang yang diperlukan.\nKalau sebelum dicetak sebaiknya saya cek dulu materi Kim-san, tolong kirimkan lewat email sebelum malam besok (tanggal 3).\nMohon bantuannya.\nTanaka",
+        "oi": [
+          "1. Menyelesaikan materinya sendiri sebelum Tanaka pergi dinas, lalu mencetak sesuai jumlah orang. (salah, Tanaka sudah keburu berangkat/di kereta, jadi bukan \"sebelum pergi\")",
+          "2. <ruby>自分<rt>じぶん</rt></ruby>と<ruby>田中<rt>たなか</rt></ruby>さんの<ruby>資料<rt>しりょう</rt></ruby>を<ruby>一<rt>ひと</rt></ruby>つにして<ruby>完成<rt>かんせい</rt></ruby>させ、<ruby>必要<rt>ひつよう</rt></ruby>な<ruby>人数分<rt>にんずうぶん</rt></ruby>を<ruby>印刷<rt>いんさつ</rt></ruby>すること ＝ Menggabungkan materi sendiri dengan materi Tanaka, menyelesaikannya, lalu mencetak sesuai jumlah yang diperlukan. ✓ (jawaban benar)",
+          "3. Mengecek apakah ada masalah pada materi Tanaka, lalu menyelesaikan materinya. (ini hanya berlaku JIKA Tanaka minta dicek — itu opsional, bukan tugas utamanya)",
+          "4. Setelah materi sendiri selesai, mengirimkannya via email ke Tanaka sebelum malam tanggal 3. (salah, justru Tanaka yang minta DIKIRIMI jika Kim ingin diperiksa dulu, bukan tugas wajib mengirim balik)"
+        ]
+      },
+      {
+        "passage": "<ruby>最近<rt>さいきん</rt></ruby>、<ruby>喫茶店<rt>きっさてん</rt></ruby>で<ruby>一人<rt>ひとり</rt></ruby>で<ruby>勉強<rt>べんきょう</rt></ruby>している<ruby>人<rt>ひと</rt></ruby>をよく<ruby>見<rt>み</rt></ruby>る。<ruby>話<rt>はな</rt></ruby>し<ruby>声<rt>ごえ</rt></ruby>がして<ruby>落<rt>お</rt></ruby>ち<ruby>着<rt>つ</rt></ruby>かないのに、なぜこんな<ruby>所<rt>ところ</rt></ruby>で<ruby>勉強<rt>べんきょう</rt></ruby>するのだろうと<ruby>思<rt>おも</rt></ruby>っていた。<br><br>でも、<ruby>先日<rt>せんじつ</rt></ruby><ruby>読<rt>よ</rt></ruby>んだ<ruby>本<rt>ほん</rt></ruby>に「<ruby>集中<rt>しゅうちゅう</rt></ruby>したいときは、<ruby>雨<rt>あめ</rt></ruby>の<ruby>音<rt>おと</rt></ruby>や<ruby>話<rt>はな</rt></ruby>し<ruby>声<rt>ごえ</rt></ruby>など<ruby>少<rt>すこ</rt></ruby>し<ruby>音<rt>おと</rt></ruby>があるほうがいい。<ruby>静<rt>しず</rt></ruby>かすぎると<ruby>小<rt>ちい</rt></ruby>さな<ruby>音<rt>おと</rt></ruby>でも<ruby>気<rt>き</rt></ruby>になるからだ。だが、<ruby>同<rt>おな</rt></ruby>じ<ruby>話<rt>はな</rt></ruby>し<ruby>声<rt>ごえ</rt></ruby>でも、<ruby>興味<rt>きょうみ</rt></ruby>がある<ruby>内容<rt>ないよう</rt></ruby>が<ruby>聞<rt>き</rt></ruby>こえると、つい<ruby>聞<rt>き</rt></ruby>いてしまうから<ruby>注意<rt>ちゅうい</rt></ruby>が<ruby>必要<rt>ひつよう</rt></ruby>だ。」と<ruby>書<rt>か</rt></ruby>かれていた。<br><br>私も<ruby>電車<rt>でんしゃ</rt></ruby>の<ruby>中<rt>なか</rt></ruby>のほうが、<ruby>静<rt>しず</rt></ruby>かな<ruby>部屋<rt>へや</rt></ruby>より<ruby>集中<rt>しゅうちゅう</rt></ruby>して<ruby>本<rt>ほん</rt></ruby>が<ruby>読<rt>よ</rt></ruby>めることに<ruby>気<rt>き</rt></ruby>づき、なるほどと<ruby>思<rt>おも</rt></ruby>った。",
+        "passageTitle": "(3) 喫茶店で勉強する人",
+        "stem": "文章によると、集中しやすいのは例えばどんな所か。",
+        "opts": [
+          "雨の音や話し声が聞こえる、うるさい部屋",
+          "雨の音も話し声も何も聞こえない、静かな図書館",
+          "興味のない内容について話している声が少し聞こえる喫茶店",
+          "面白そうな内容について話している声が少し聞こえる電車の中"
+        ],
+        "ans": 2,
+        "exp": "Kutipan buku: perlu sedikit suara agar bisa konsentrasi (bukan sunyi total), TAPI kalau isi obrolannya menarik minat, kita jadi malah ikut mendengarkan (mengganggu konsentrasi). Maka tempat ideal = ada sedikit suara TAPI isinya TIDAK menarik minat kita.",
+        "full": "<ruby>文章<rt>ぶんしょう</rt></ruby>によると、<ruby>集中<rt>しゅうちゅう</rt></ruby>しやすいのは<ruby>例<rt>たと</rt></ruby>えばどんな<ruby>所<rt>ところ</rt></ruby>か。",
+        "ftr": "Belakangan ini, saya sering melihat orang belajar sendirian di kedai kopi. Saya heran, padahal ada suara orang mengobrol yang bikin tidak tenang, kenapa mereka belajar di tempat seperti itu.\n\nTapi, dalam buku yang saya baca belum lama ini tertulis: \"Kalau ingin berkonsentrasi, lebih baik ada sedikit suara seperti suara hujan atau obrolan orang. Karena kalau terlalu sunyi, suara kecil apapun jadi mengganggu. Tapi, meski sama-sama suara obrolan, kalau kita mendengar isi yang menarik minat kita, kita jadi tanpa sadar ikut mendengarkan — jadi perlu hati-hati.\"\n\nSaya sendiri juga menyadari lebih bisa konsentrasi membaca buku di dalam kereta dibanding di kamar yang sunyi, dan saya jadi mengerti maksudnya.",
+        "oi": [
+          "1. Kamar berisik dengan suara hujan dan obrolan (terlalu banyak/keras suara). (salah, teks hanya bilang perlu SEDIKIT suara, bukan yang berisik)",
+          "2. Perpustakaan sunyi tanpa suara hujan atau obrolan sama sekali. (salah, teks bilang terlalu sunyi justru membuat suara kecil apapun mengganggu)",
+          "3. <ruby>興味<rt>きょうみ</rt></ruby>のない<ruby>内容<rt>ないよう</rt></ruby>について<ruby>話<rt>はな</rt></ruby>している<ruby>声<rt>こえ</rt></ruby>が<ruby>少<rt>すこ</rt></ruby>し<ruby>聞<rt>き</rt></ruby>こえる<ruby>喫茶店<rt>きっさてん</rt></ruby> ＝ Kedai kopi dengan sedikit suara obrolan yang isinya TIDAK menarik minat kita. ✓ (jawaban benar — sedikit suara tapi tidak membuat kita ikut mendengarkan)",
+          "4. Kereta dengan sedikit suara obrolan yang isinya kelihatan menarik. (salah, justru isi yang MENARIK MINAT membuat kita jadi ikut mendengarkan dan mengganggu konsentrasi)"
+        ]
+      }
+    ]
+  }
+];
+
+const CATEGORY_LABEL = {
+  tanbun: "短文読解",
+  chubun: "中文読解",
+  chobun: "長文読解",
+  jouhou: "情報検索"
+};
+const CATEGORY_ICON = {
+  tanbun: "📄", chubun: "📝", chobun: "📚", jouhou: "🔍"
+};
+
+/* ===== Flatten into a master question list with global sequential numbering ===== */
+const MASTER = [];
+KADAI.forEach(k=>{
+  if(k.multi_passage){
+    k.questions.forEach((q,idx)=>{
+      MASTER.push({
+        gnum: 0, // assigned below
+        kadaiId: k.id, kadaiDay: k.day, category: k.category,
+        passageTitle: q.passageTitle || k.passageTitle,
+        passage: q.passage,
+        stem: q.stem, opts: q.opts, ans: q.ans, exp: q.exp,
+        full: q.full, ftr: q.ftr, oi: q.oi
+      });
+    });
+  } else {
+    k.questions.forEach((q)=>{
+      MASTER.push({
+        gnum: 0,
+        kadaiId: k.id, kadaiDay: k.day, category: k.category,
+        passageTitle: k.passageTitle,
+        passage: k.passage,
+        stem: q.stem, opts: q.opts, ans: q.ans, exp: q.exp,
+        full: q.full, ftr: q.ftr, oi: q.oi
+      });
+    });
+  }
+});
+MASTER.forEach((q,i)=>{ q.gnum = i+1; });
+const TOTAL_ALL = MASTER.length;
+
+/* ===== Progress persistence (per global question number) ===== */
+const STORAGE_KEY = 'dokkai_kadai_harian_n3_progress';
+let PROGRESS = {}; // { gnum: true/false }
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) PROGRESS = JSON.parse(raw);
+  }catch(e){ PROGRESS = {}; }
+}
+function saveProgress(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(PROGRESS)); }catch(e){}
+}
+loadProgress();
+
+function getAllQuestions(){ return MASTER.slice(); }
+function getQuestionsByKadai(id){ return MASTER.filter(q=>q.kadaiId===id); }
+function getQuestionsByCategory(cat){ return MASTER.filter(q=>q.category===cat); }
+function getWrongQuestions(){ return MASTER.filter(q=> PROGRESS[q.gnum]===false); }
+
+function countAnswered(list){ return list.filter(q=>PROGRESS[q.gnum]!==undefined).length; }
+function countCorrect(list){ return list.filter(q=>PROGRESS[q.gnum]===true).length; }
+
+/* ===== Build menu screen ===== */
+function renderMenu(){
+  const all = getAllQuestions();
+  const answeredAll = countAnswered(all);
+  document.getElementById('allDesc').textContent = `課題1〜${KADAI.length} まとめて（${TOTAL_ALL}問）`;
+  document.getElementById('allProgressFill').style.width = (answeredAll/TOTAL_ALL*100)+'%';
+  document.getElementById('allProgressText').textContent = `${answeredAll} / ${TOTAL_ALL} 問回答済み`;
+  document.getElementById('focusProgressFill').style.width = (answeredAll/TOTAL_ALL*100)+'%';
+  document.getElementById('focusProgressText').textContent = `${answeredAll} / ${TOTAL_ALL} 問回答済み`;
+
+  const wrong = getWrongQuestions();
+  const reviewCard = document.getElementById('reviewCard');
+  document.getElementById('reviewDesc').textContent = `これまでに間違えた問題だけをまとめて解く（${wrong.length}問）`;
+  if(wrong.length===0){ reviewCard.classList.add('disabled'); } else { reviewCard.classList.remove('disabled'); }
+
+  // Kadai grid
+  const grid = document.getElementById('kadaiGrid');
+  grid.innerHTML = '';
+  KADAI.forEach(k=>{
+    const qs = getQuestionsByKadai(k.id);
+    const correct = countCorrect(qs);
+    const done = countAnswered(qs)===qs.length && qs.length>0;
+    const b = document.createElement('button');
+    b.textContent = k.id;
+    b.title = k.day + ' ('+CATEGORY_LABEL[k.category]+')';
+    if(done) b.classList.add('cleared');
+    b.onclick = ()=> startQuiz(qs, k.day+'（'+CATEGORY_LABEL[k.category]+'）');
+    grid.appendChild(b);
+  });
+  document.getElementById('kadaiHint').textContent = `現在、課題1〜${KADAI.length}まで利用可能です（今後も追加予定）`;
+
+  // Category pills
+  const pillWrap = document.getElementById('categoryPills');
+  pillWrap.innerHTML = '';
+  ['tanbun','chubun','chobun','jouhou'].forEach(cat=>{
+    const qs = getQuestionsByCategory(cat);
+    const b = document.createElement('button');
+    b.innerHTML = `${CATEGORY_ICON[cat]} ${CATEGORY_LABEL[cat]} <span class="cnt">(${qs.length}問)</span>`;
+    if(qs.length===0){
+      b.disabled = true;
+      b.innerHTML = `${CATEGORY_ICON[cat]} ${CATEGORY_LABEL[cat]} <span class="cnt">(準備中)</span>`;
+    } else {
+      b.onclick = ()=> startQuiz(qs, CATEGORY_LABEL[cat]+'（集中トレーニング）');
+    }
+    pillWrap.appendChild(b);
+  });
+}
+
+/* ===== Quiz state ===== */
+let currentList = [];
+let currentIdx = 0;
+let currentLabel = '';
+let currentAnswers = {}; // idx in currentList -> selected option idx
+
+function startQuiz(list, label){
+  if(!list || list.length===0) return;
+  currentList = list;
+  currentIdx = 0;
+  currentLabel = label || (list[0].kadaiDay || '');
+  currentAnswers = {};
+  document.getElementById('menuScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.add('hidden');
+  document.getElementById('quizScreen').classList.remove('hidden');
+  renderQuestion();
+}
+function startReview(){
+  const wrong = getWrongQuestions();
+  if(wrong.length===0) return;
+  startQuiz(wrong, '間違えた問題の復習');
+}
+function goToMenu(){
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.add('hidden');
+  document.getElementById('menuScreen').classList.remove('hidden');
+  renderMenu();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderQuestion(){
+  const q = currentList[currentIdx];
+  document.getElementById('quizModeLabel').textContent = currentLabel;
+  document.getElementById('progressText').textContent = `${currentIdx+1} / ${currentList.length}`;
+  document.getElementById('progressFillTop').style.width = ((currentIdx+1)/currentList.length*100)+'%';
+
+  const catLabel = CATEGORY_LABEL[q.category] || '';
+  let html = `<div class="catbadge">${catLabel} ・ ${q.kadaiDay}</div>`;
+
+  if(q.passage){
+    html += `<div class="passage-box">`;
+    if(q.passageTitle) html += `<div class="ptitle">📖 ${q.passageTitle}</div>`;
+    html += `<div class="ptext">${q.passage}</div></div>`;
+  }
+
+  html += `<div class="qstem-row"><div class="qnum-badge">${q.gnum}</div><div class="qstem">${q.stem}</div></div>`;
+
+  html += `<div class="opts" id="optsWrap">`;
+  q.opts.forEach((opt,i)=>{
+    html += `<div class="opt" data-idx="${i}" onclick="pickOption(${i})"><div class="badge">${i+1}</div><div>${opt}</div></div>`;
+  });
+  html += `</div><div class="feedback" id="feedback"></div>`;
+
+  document.getElementById('qcard').innerHTML = html;
+
+  if(currentAnswers[currentIdx]!==undefined){
+    lockOptions(currentAnswers[currentIdx]);
+    showFeedback(currentAnswers[currentIdx]);
+  }
+
+  document.getElementById('prevBtn').disabled = (currentIdx===0);
+  const allDone = currentList.every((_,i)=>currentAnswers[i]!==undefined);
+  document.getElementById('nextBtn').textContent = (currentIdx===currentList.length-1) ? '結果を見る ✓' : '次へ →';
+}
+
+function pickOption(i){
+  if(currentAnswers[currentIdx]!==undefined) return;
+  currentAnswers[currentIdx] = i;
+  const q = currentList[currentIdx];
+  PROGRESS[q.gnum] = (i===q.ans);
+  saveProgress();
+  lockOptions(i);
+  showFeedback(i);
+}
+
+function lockOptions(selectedIdx){
+  const q = currentList[currentIdx];
+  document.querySelectorAll('#optsWrap .opt').forEach(el=>{
+    const idx = parseInt(el.dataset.idx);
+    el.classList.add('disabled');
+    if(idx===q.ans) el.classList.add('correct');
+    else if(idx===selectedIdx) el.classList.add('incorrect');
+    if(idx===selectedIdx) el.classList.add('selected');
+  });
+}
+
+function showFeedback(selectedIdx){
+  const q = currentList[currentIdx];
+  const isCorrect = selectedIdx===q.ans;
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (isCorrect?'ok':'ng');
+  let html = `<div class="fb-head">${isCorrect?'✓ 正解！':'✗ 不正解'}</div><div class="fb-body">`;
+  html += `<div class="fb-correct-ans">📌 正解：${q.ans+1}. ${q.opts[q.ans]}</div>`;
+  html += `<div>${q.exp}</div>`;
+  html += `<div class="orig-block">`;
+  if(q.full){ html += `<div class="lbl">📝 設問（ルビ付き）</div><div class="jp">${q.full}</div>`; }
+  if(q.ftr){ html += `<div class="lbl">🇮🇩 Terjemahan Bacaan</div><div class="id2">${q.ftr}</div>`; }
+  if(q.oi && q.oi.length){
+    html += `<div class="lbl">📋 Semua Pilihan (ruby + arti)</div><ol>`;
+    q.oi.forEach((item,i)=>{ html += `<li class="${i===q.ans?'correct-li':''}">${item}</li>`; });
+    html += `</ol>`;
+  }
+  html += `</div></div>`;
+  fb.innerHTML = html;
+  fb.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function goNext(){
+  const allDone = currentList.every((_,i)=>currentAnswers[i]!==undefined);
+  if(currentIdx===currentList.length-1 && allDone){ showResult(); return; }
+  if(currentIdx < currentList.length-1){ currentIdx++; renderQuestion(); }
+  else {
+    const nextUnanswered = currentList.findIndex((_,i)=>currentAnswers[i]===undefined);
+    if(nextUnanswered!==-1){ currentIdx = nextUnanswered; renderQuestion(); }
+    else showResult();
+  }
+}
+function goPrev(){
+  if(currentIdx===0) return;
+  currentIdx--; renderQuestion();
+}
+
+function showResult(){
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.remove('hidden');
+  const total = currentList.length;
+  const correct = currentList.reduce((acc,q,i)=> acc + (currentAnswers[i]===q.ans?1:0), 0);
+  const pct = Math.round(correct/total*100);
+  document.getElementById('scorePct').textContent = pct+'%';
+  document.getElementById('scoreFrac').textContent = `${correct} / ${total}`;
+  const circumference = 2*Math.PI*60;
+  const offset = circumference - (pct/100)*circumference;
+  const ring = document.getElementById('ringFg');
+  ring.setAttribute('stroke-dasharray', circumference);
+  ring.style.transition='stroke-dashoffset 1s ease';
+  setTimeout(()=>ring.setAttribute('stroke-dashoffset', offset), 100);
+
+  let title, comment;
+  if(pct>=80){ title='素晴らしい出来です！'; comment='この調子でどんどん次の課題に進みましょう。'; }
+  else if(pct>=60){ title='もう少しで完璧！'; comment='間違えた問題の解説をチェックしておきましょう。'; }
+  else { title='復習していきましょう'; comment='焦らず、解説を読みながら少しずつ力をつけていきましょう。'; }
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultComment').textContent = comment;
+  document.getElementById('reviewListArea').innerHTML = '';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showReviewList(){
+  const area = document.getElementById('reviewListArea');
+  let html = '';
+  currentList.forEach((q,i)=>{
+    const sel = currentAnswers[i];
+    const isCorrect = sel===q.ans;
+    html += `<div style="border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:10px;">
+      <div style="font-size:.9rem; margin-bottom:6px;"><b>問${q.gnum}.</b> ${q.stem.replace(/<[^>]+>/g,'')}</div>
+      <div style="font-size:.78rem; color:${isCorrect?'var(--good)':'var(--bad)'};">${isCorrect?'✓':'✗'} あなたの答え: ${sel!==undefined?(sel+1)+'. '+q.opts[sel].replace(/<[^>]+>/g,''):'(未回答)'} ｜ 正解: ${q.ans+1}. ${q.opts[q.ans].replace(/<[^>]+>/g,'')}</div>
+      <div style="font-size:.78rem; color:var(--sub); margin-top:4px;">${q.exp}</div>
+    </div>`;
+  });
+  area.innerHTML = html;
+  area.scrollIntoView({behavior:'smooth'});
+}
+
+/* INIT */
+renderMenu();
+</script>
+</body>
+</html>
